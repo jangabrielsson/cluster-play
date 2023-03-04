@@ -1,0 +1,27 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: dev
+servers: 1
+agents: 2
+volumes: # repeatable flags are represented as YAML lists
+  - volume: /Users/erajgab/development/k3d/src:/src
+    nodeFilters:
+      - server:0
+      - agent:*
+#image: rancher/k3s:v1.25.2-k3s1
+ports:
+- port: 30000-30777:30000-30777
+  nodeFilters:
+  - server:*
+registries:
+  create:
+    name: dev
+    host: 0.0.0.0
+    hostPort: "7888"
+options:
+  k3s:
+    extraArgs:
+    - arg: --disable=traefik
+      nodeFilters:
+      - server:*

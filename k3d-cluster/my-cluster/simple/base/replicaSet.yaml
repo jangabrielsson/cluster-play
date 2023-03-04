@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    app: simple-service
+  name: simple-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-service
+  template:
+    metadata:
+      labels:
+        app: simple-service
+    spec:
+      terminationGracePeriodSeconds: 3
+      containers:
+      - image: dev:7888/app:v9
+        name: controller
+        command: ["/usr/local/bin/lua"]
+        args: ["/src/simpleService.lua"]
+        workingDir: "/src"
+        envFrom:
+         - configMapRef:
+            name: simple-config-env-file
+        ports:
+        - containerPort: 8765  # web
+        - containerPort: 6977  # RPC client
+        volumeMounts:
+        - name: host-mount
+          mountPath: /src
+      volumes:
+      - name: host-mount
+        hostPath:
+          path: /src

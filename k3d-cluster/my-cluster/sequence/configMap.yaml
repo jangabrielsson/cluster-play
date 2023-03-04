@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sequence-env-file
+  namespace: default
+data:
+  DNS: "discovery-headless.default.svc.cluster.local"
+  PEER_UDP_PORT: "6976"
+  RPC_PORT: "6977"
+  PROBE_PORT: "8765"

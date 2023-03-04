@@ -1,0 +1,61 @@
+apiVersion: k3d.io/v1alpha2
+kind: Simple
+name: dev
+servers: 1 
+agents: 2
+kubeAPI:
+  hostIP: "0.0.0.0"
+  hostPort: "6443" # kubernetes api port 6443:6443
+
+image: rancher/k3s:latest
+#image: rancher/k3s:v1.19.4-k3s1
+
+volumes:
+#  - volume: /Users/erajgab/development/k3d/k3d-cluster/k3deploy/helm-ingress-ngnx.yaml:/var/lib/rancher/k3s/server/manifests/helm-ingress-nginx.yaml
+  - volume: /Users/erajgab/development/k3d/k3d-cluster/k3dvol:/k3dvol # volume in host:container
+    nodeFilters:
+      - all
+
+ports:
+  - port: 80:80 # http port host:container
+    nodeFilters:
+      - loadbalancer
+  - port: 0.0.0.0:443:443 # https port host:container
+    nodeFilters:
+      - loadbalancer
+
+env:
+  - envVar: secret=token
+    nodeFilters:
+      - all
+labels:
+  - label: best_cluster=forced_tag
+    nodeFilters:
+      - server[0] # 
+      - loadbalancer
+
+#registries:
+#  create: true
+#  use: []
+#  config: |
+#    mirrors:
+#      "my.company.registry":
+#        endpoint:
+#          - http://my.company.registry:5000
+
+options:
+  k3d:
+    wait: true
+    timeout: "60s" # avoid an start/stop cicle when start fails
+    disableLoadbalancer: false
+    disableImageVolume: false
+  k3s:
+    extraServerArgs:
+      - --tls-san=127.0.0.1
+      - --no-deploy=traefik
+#      - --flannel-backend=none
+
+    extraAgentArgs: []
+  kubeconfig:
+    updateDefaultKubeconfig: true # update kubeconfig when cluster starts
+    switchCurrentContext: true # change this cluster context when cluster starts

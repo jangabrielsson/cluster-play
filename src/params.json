@@ -1,0 +1,15 @@
+{
+  "discovery_DNS" : "discovery-headless.default.svc.cluster.local",
+  "discovery_PEER_UDP_PORT" : "6976",
+  "discovery_RPC_PORT" : "6977",
+  "discoveryOne_RPC_PORT" : "6977",
+  "discoveryOne_PROBE_PORT" : "8765",
+  "testClient_DISC_ENDPOINT" : "rpc://localhost:30123/discovery",
+  "testClient_RPC_PORT" : "6980",
+  "testClient_UDP_PORT" : "6990",
+  "testClient_PROBE_PORT" : "8765",
+  "simpleService_DISC_ENDPOINT" : "rpc://localhost:30123/discovery",
+  "simpleService_RPC_PORT" : "6980",
+  "simpleService_UDP_PORT" : "6990",
+  "simpleService_PROBE_PORT" : "8765"
+}

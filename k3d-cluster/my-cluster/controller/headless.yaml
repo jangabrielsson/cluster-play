@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: discovery-headless
+spec:
+  clusterIP: None
+  selector:
+    discdom: dep1
+

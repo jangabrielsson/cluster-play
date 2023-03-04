@@ -1,0 +1,6 @@
+# test replica
+redis-cli -h localhost -p 30201 info replication 
+# test master
+redis-cli -h localhost -p 30201 info replication
+# run benchmark (master)
+redis-benchmark -h localhost -p 30202

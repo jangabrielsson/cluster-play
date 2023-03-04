@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+- target:
+    kind: ReplicaSet
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/livenessProbe
+      value:
+          httpGet:
+            path: /liveness
+            port: 8765
+          initialDelaySeconds: 10 # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 10       # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 1     # number of failures after which the container will not be restarted
+    - op: add
+      path: /spec/template/spec/containers/0/startupProbe
+      value:
+          httpGet:
+            path: /startup
+            port: 8765
+          initialDelaySeconds: 4  # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 4        # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 5     # number of failures after which the container will not be restarted
+    - op: add
+      path: /spec/template/spec/containers/0/readinessProbe
+      value:
+          httpGet:
+            path: /readiness
+            port: 8765
+          initialDelaySeconds: 1  # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 6        # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 1     # number of failures after which the container will not be restarted

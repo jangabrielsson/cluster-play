@@ -1,0 +1,8 @@
+## Create cluster
+k3d cluster create --config cluster.yaml
+
+## Delete cluster
+k3d cluster delete dev
+
+## Add portainer admin on localhost:30777
+kubectl apply -n portainer -f https://raw.githubusercontent.com/portainer/k8s/master/deploy/manifests/portainer/portainer.yaml

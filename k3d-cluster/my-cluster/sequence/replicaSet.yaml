@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    app: sequencetest
+  name: sequencetest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sequencetest
+  template:
+    metadata:
+      labels:
+        app: sequencetest
+    spec:
+      terminationGracePeriodSeconds: 3
+      containers:
+      - image: dev:7888/app:v9
+        name: sequencea
+        command: ["/usr/local/bin/lua"]
+        args: ["/code/SequenceContainer.lua"]
+        workingDir: "/code"
+        env:
+        - name: CONTAINER_LOGNAME
+          value: "A"
+        - name: DELAY
+          value: "30"
+        envFrom:
+         - configMapRef:
+            name: sequence-env-file
+        ports:
+        - containerPort: 8765  # web
+        - containerPort: 6977  # RPC client
+        lifecycle:
+         preStop:
+            httpGet:
+              path: /podstop
+              port: 8765
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 8765
+          initialDelaySeconds: 20 # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 10       # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 1     # number of failures after which the container will not be restarted
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8765
+          initialDelaySeconds: 8  # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 4        # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 3     # number of failures after which the container will not be restarted
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8765
+          initialDelaySeconds: 1  # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 6        # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 10     # number of failures after which the container will not be restarted
+        volumeMounts:
+        - name: host-mount
+          mountPath: /code
+      - image: dev:7888/app:v9
+        name: sequenceb
+        command: ["/usr/local/bin/lua"]
+        args: ["/code/SequenceContainer.lua"]
+        workingDir: "/code"
+        env:
+        - name: CONTAINER_LOGNAME
+          value: "B"
+        - name: PROBE_PORT
+          value: "8766"
+        - name: DELAY
+          value: "5"
+        envFrom:
+         - configMapRef:
+            name: sequence-env-file
+        ports:
+        - containerPort: 8766  # web
+        - containerPort: 6977  # RPC client
+#        lifecycle:
+#          preStop:
+#            httpGet:
+#              path: /podstop
+#              port: 8765
+#              host: localhost
+#              scheme: HTTP
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 8766
+          initialDelaySeconds: 20 # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 10       # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 1     # number of failures after which the container will not be restarted
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8766
+          initialDelaySeconds: 8  # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 4        # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 3     # number of failures after which the container will not be restarted
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8766
+          initialDelaySeconds: 1  # seconds before probes starts runnning
+          timeoutSeconds: 2       # seconds before probes timeouts (http)
+          periodSeconds: 6        # how often to run probe
+          successThreshold: 1     # number of needed successes after a failure
+          failureThreshold: 1     # number of failures after which the container will not be restarted
+        volumeMounts:
+        - name: host-mount
+          mountPath: /code
+      volumes:
+      - name: host-mount
+        hostPath:
+          path: /code
