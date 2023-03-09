@@ -5,7 +5,7 @@ metadata:
 servers: 1
 agents: 2
 volumes: # repeatable flags are represented as YAML lists
-  - volume: /Users/erajgab/development/k3d/src:/src
+  - volume: /Users/erajgab/development/k3d/cluster-play/src:/src
     nodeFilters:
       - server:0
       - agent:*
